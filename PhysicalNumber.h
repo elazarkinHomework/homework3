@@ -20,6 +20,8 @@ class PhysicalNumber
 {
 private:
 
+	double m_value;
+
 	class IMeasure
 	{
 	protected:
@@ -30,6 +32,9 @@ private:
 	public:
 
 		IMeasure(Unit u);
+
+		Unit unit();
+
 		static bool isFriend(const Unit *friendsList, int listSize, Unit u);
 
 		static IMeasure *generateMeasure(Unit u);
@@ -100,8 +105,9 @@ public:
 	bool operator>=(const PhysicalNumber&){return false;}
 	bool operator==(const PhysicalNumber&){return false;}
 
-	friend std::ostream& operator<<(std::ostream& out, const PhysicalNumber&)
+	friend std::ostream& operator<<(std::ostream& out, const PhysicalNumber& pn)
 	{
+		out << pn.m_value << "[" << pn.m_measure->unit() << "]";
 		return out;
 	}
 

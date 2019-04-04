@@ -24,6 +24,7 @@ const PhysicalNumber::IMeasure::CreateIfContainMeasureFunction *PhysicalNumber::
 
 PhysicalNumber::PhysicalNumber(double value, Unit type)
 {
+	m_value = value;
 	m_measure = IMeasure::generateMeasure(type);
 }
 
@@ -62,6 +63,11 @@ PhysicalNumber& PhysicalNumber::operator +=(const PhysicalNumber&)
 PhysicalNumber::IMeasure::IMeasure(Unit u)
 {
 	m_unit = u;
+}
+
+Unit PhysicalNumber::IMeasure::unit()
+{
+	return m_unit;
 }
 
 bool PhysicalNumber::IMeasure::isFriend(const Unit *friendsList, int listSize, Unit u)

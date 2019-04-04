@@ -8,13 +8,26 @@
 #ifndef UNIT_H_
 #define UNIT_H_
 
+#include <ostream>
+
 namespace ariel
 {
 
 enum Unit
 {
-	KM, M, CM, MM, HOUR, MIN, SEC, TON, KG, G
+	KM = 0, M, CM, MM, HOUR, MIN, SEC, TON, KG, G
 };
+
+static const char *UnitToStringMap[] =
+{
+	"KM", "M", "CM", "MM", "HOUR", "MIN", "SEC", "TON", "KG", "G"
+};
+
+inline std::ostream& operator<<(std::ostream &os, Unit u)
+{
+	os << UnitToStringMap[u];
+	return os;
+}
 
 }  // namespace ariel
 
