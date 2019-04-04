@@ -61,7 +61,6 @@ PhysicalNumber& PhysicalNumber::operator +=(const PhysicalNumber&)
 
 PhysicalNumber::IMeasure::IMeasure(Unit u)
 {
-	printf("IMeasure Constructor\n");
 	m_unit = u;
 }
 
@@ -69,7 +68,6 @@ bool PhysicalNumber::IMeasure::isFriend(const Unit *friendsList, int listSize, U
 {
 	for(int i = 0; i < listSize; i++)
 	{
-		printf("check %d expect %d listSize=%d\n", friendsList[i], u, listSize);
 		if(friendsList[i] == u)
 		{
 			return true;
@@ -78,16 +76,12 @@ bool PhysicalNumber::IMeasure::isFriend(const Unit *friendsList, int listSize, U
 	return false;
 }
 
-PhysicalNumber::LenghtMeasure::LenghtMeasure(Unit u):IMeasure(u)
-{
-	printf("LenghtMeasure Constructor\n");
-}
+PhysicalNumber::LenghtMeasure::LenghtMeasure(Unit u):IMeasure(u){}
 
 PhysicalNumber::IMeasure* PhysicalNumber::LenghtMeasure::createIfContainMeasure(Unit u)
 {
 	if(isFriend(s_friends, sizeof(s_friends)/sizeof(Unit), u))
 	{
-		printf("create LenghtMeasure\n");
 		return new PhysicalNumber::LenghtMeasure(u);
 	}
 	return NULL;
@@ -99,11 +93,12 @@ void PhysicalNumber::LenghtMeasure::lockOnFriendsMeasures(Unit **out, int &amoun
 	amount = sizeof(s_friends)/sizeof(Unit);
 }
 
+PhysicalNumber::WeightMeasure::WeightMeasure(Unit u):IMeasure(u){}
+
 PhysicalNumber::IMeasure* PhysicalNumber::WeightMeasure::createIfContainMeasure(Unit u)
 {
 	if(isFriend(s_friends, sizeof(s_friends)/sizeof(Unit), u))
 	{
-		printf("create WeightMeasure\n");
 		return new WeightMeasure(u);
 	}
 	return NULL;
@@ -115,11 +110,12 @@ void PhysicalNumber::WeightMeasure::lockOnFriendsMeasures(Unit **out, int &amoun
 	amount = sizeof(s_friends)/sizeof(Unit);
 }
 
+PhysicalNumber::TimeMeasure::TimeMeasure(Unit u):IMeasure(u){}
+
 PhysicalNumber::IMeasure* PhysicalNumber::TimeMeasure::createIfContainMeasure(Unit u)
 {
 	if(isFriend(s_friends, sizeof(s_friends)/sizeof(Unit), u))
 	{
-		printf("create TimeMeasure\n");
 		return new TimeMeasure(u);
 	}
 	return NULL;
@@ -139,15 +135,10 @@ PhysicalNumber::IMeasure* PhysicalNumber::IMeasure::generateMeasure(Unit u)
 
 	int functionsIndex = 0;
 
-	fprintf(stdout, "generateMeasure: FUNCTIONS_SIZE = %d\n", FUNCTIONS_SIZE);
-
 	while(functionsIndex < FUNCTIONS_SIZE && (ret=s_createIfContainMeasureFunctions[functionsIndex](u)) == NULL)
 	{
-		fprintf(stdout, "generateMeasure: %d/%d\n", functionsIndex, FUNCTIONS_SIZE);
 		functionsIndex++;
 	}
-
-	fprintf(stdout, "generateMeasure: finish\n");
 
 	return ret;
 }

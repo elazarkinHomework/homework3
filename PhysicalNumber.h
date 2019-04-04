@@ -58,7 +58,7 @@ private:
 	class WeightMeasure : public IMeasure
 	{
 	public:
-		WeightMeasure(Unit u):IMeasure(u){}
+		WeightMeasure(Unit u);
 	private:
 			const static Unit s_friends[];
 
@@ -72,7 +72,7 @@ private:
 	class TimeMeasure : public IMeasure
 	{
 	public:
-		TimeMeasure(Unit u):IMeasure(u){}
+		TimeMeasure(Unit u);
 	private:
 			const static Unit s_friends[];
 
