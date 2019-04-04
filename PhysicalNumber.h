@@ -22,8 +22,25 @@ private:
 
 	double m_value;
 
+	class UnitsScalesLookUpTable
+	{
+	private:
+		double m_lookUpTable[Unit::UNITS_SIZE];
+
+		typedef void (LockOnFriendsUnitsAndScalesFunction)(Unit **units, double **scales, int &amount);
+
+		static const LockOnFriendsUnitsAndScalesFunction *s_lockOnFriendsUnitsAndScalesFunction[];
+
+	public:
+		UnitsScalesLookUpTable();
+
+	};
+
 	class IMeasure
 	{
+	private:
+		static const UnitsScalesLookUpTable s_unitsScalesLookUpTable;
+
 	protected:
 		Unit m_unit;
 
@@ -39,8 +56,11 @@ private:
 
 		static IMeasure *generateMeasure(Unit u);
 
+		static double toSmallestUnit(double value, Unit unit);
+
 	public:
 		typedef IMeasure*(CreateIfContainMeasureFunction)(Unit u);
+
 	private:
 		static const CreateIfContainMeasureFunction *s_createIfContainMeasureFunctions[];
 	};
@@ -51,13 +71,16 @@ private:
 		LenghtMeasure(Unit u);
 
 	private:
-		const static Unit s_friends[];
+		const static Unit s_friendsOrdBig2Small[];
+		const static double s_scalesRelatedSmallest[];
 
 	protected:
 		void lockOnFriendsMeasures(Unit **, int &amount);
 
 	public:
 		static IMeasure* createIfContainMeasure(Unit u);
+
+		static void LockOnFriendsUnitsAndScales(Unit **units, double **scales, int &amount);
 	};
 
 	class WeightMeasure : public IMeasure
@@ -65,13 +88,17 @@ private:
 	public:
 		WeightMeasure(Unit u);
 	private:
-			const static Unit s_friends[];
+			const static Unit s_friendsOrdBig2Small[];
+			const static double s_scalesRelatedSmallest[];
 
 	protected:
 			void lockOnFriendsMeasures(Unit **, int &amount);
 
 	public:
 			static IMeasure* createIfContainMeasure(Unit u);
+
+			static void LockOnFriendsUnitsAndScales(Unit **units, double **scales, int &amount);
+
 	};
 
 	class TimeMeasure : public IMeasure
@@ -79,13 +106,17 @@ private:
 	public:
 		TimeMeasure(Unit u);
 	private:
-			const static Unit s_friends[];
+			const static Unit s_friendsOrdBig2Small[];
+			const static double s_scalesRelatedSmallest[];
 
 	protected:
 			void lockOnFriendsMeasures(Unit **, int &amount);
 
 	public:
 			static IMeasure* createIfContainMeasure(Unit u);
+
+			static void LockOnFriendsUnitsAndScales(Unit **units, double **scales, int &amount);
+
 	};
 
 	IMeasure *m_measure;

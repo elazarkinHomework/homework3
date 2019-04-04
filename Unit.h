@@ -15,12 +15,12 @@ namespace ariel
 
 enum Unit
 {
-	KM = 0, M, CM, MM, HOUR, MIN, SEC, TON, KG, G
+	KM = 0, M, CM, MM, HOUR, MIN, SEC, TON, KG, G, UNITS_SIZE
 };
 
 static const char *UnitToStringMap[] =
 {
-	"KM", "M", "CM", "MM", "HOUR", "MIN", "SEC", "TON", "KG", "G"
+	"km", "m", "cm", "mm", "hour", "min", "sec", "ton", "kg", "g"
 };
 
 inline std::ostream& operator<<(std::ostream &os, Unit u)

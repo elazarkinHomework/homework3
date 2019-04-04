@@ -9,11 +9,16 @@
 
 namespace ariel {
 
-const Unit PhysicalNumber::LenghtMeasure::s_friends[] = {Unit::KM, Unit::M, Unit::CM, Unit::MM};
+const Unit PhysicalNumber::LenghtMeasure::s_friendsOrdBig2Small[] = {Unit::KM, Unit::M, Unit::CM, Unit::MM};
+const double PhysicalNumber::LenghtMeasure::s_scalesRelatedSmallest[] = {1000000.0, 1000.0, 10.0, 1.0};
 
-const Unit PhysicalNumber::WeightMeasure::s_friends[] = {Unit::TON, Unit::KG, Unit::G};
+const Unit PhysicalNumber::WeightMeasure::s_friendsOrdBig2Small[] = {Unit::TON, Unit::KG, Unit::G};
+const double PhysicalNumber::WeightMeasure::s_scalesRelatedSmallest[] = {1000000.0, 1000.0, 1.0};
 
-const Unit PhysicalNumber::TimeMeasure::s_friends[] = {Unit::HOUR, Unit::MIN, Unit::SEC};
+const Unit PhysicalNumber::TimeMeasure::s_friendsOrdBig2Small[] = {Unit::HOUR, Unit::MIN, Unit::SEC};
+const double PhysicalNumber::TimeMeasure::s_scalesRelatedSmallest[] = {3600.0, 60.0, 1.0};
+
+const PhysicalNumber::UnitsScalesLookUpTable PhysicalNumber::IMeasure::s_unitsScalesLookUpTable;
 
 const PhysicalNumber::IMeasure::CreateIfContainMeasureFunction *PhysicalNumber::IMeasure::s_createIfContainMeasureFunctions[] =
 {
@@ -21,6 +26,32 @@ const PhysicalNumber::IMeasure::CreateIfContainMeasureFunction *PhysicalNumber::
 	&PhysicalNumber::WeightMeasure::createIfContainMeasure,
 	&PhysicalNumber::TimeMeasure::createIfContainMeasure
 };
+
+const PhysicalNumber::UnitsScalesLookUpTable::LockOnFriendsUnitsAndScalesFunction *PhysicalNumber::UnitsScalesLookUpTable::s_lockOnFriendsUnitsAndScalesFunction[] =
+{
+	&PhysicalNumber::LenghtMeasure::LockOnFriendsUnitsAndScales,
+	&PhysicalNumber::WeightMeasure::LockOnFriendsUnitsAndScales,
+	&PhysicalNumber::TimeMeasure::LockOnFriendsUnitsAndScales
+};
+
+PhysicalNumber::UnitsScalesLookUpTable::UnitsScalesLookUpTable()
+{
+	int FUNCTIONS_SIZE = sizeof(s_lockOnFriendsUnitsAndScalesFunction)/sizeof(PhysicalNumber::UnitsScalesLookUpTable::LockOnFriendsUnitsAndScalesFunction *);
+
+	for(int i = 0; i < FUNCTIONS_SIZE; i++)
+	{
+		Unit *unitPtr = NULL;
+		double *scalePtr = NULL;
+		int amount = 0;
+
+		s_lockOnFriendsUnitsAndScalesFunction[i](&unitPtr, &scalePtr, amount);
+
+		for(int j = 0; j < amount; j++)
+		{
+			m_lookUpTable[unitPtr[j]] = scalePtr[j];
+		}
+	}
+}
 
 PhysicalNumber::PhysicalNumber(double value, Unit type)
 {
@@ -36,9 +67,10 @@ PhysicalNumber::~PhysicalNumber()
 	}
 }
 
-PhysicalNumber PhysicalNumber::operator+(const PhysicalNumber&)
+PhysicalNumber PhysicalNumber::operator+(const PhysicalNumber& another)
 {
-	//TODO
+	double result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) + IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
+	// TODO add convert to best unit function and call
 	return PhysicalNumber(0.0, Unit::M);
 }
 
@@ -86,51 +118,72 @@ PhysicalNumber::LenghtMeasure::LenghtMeasure(Unit u):IMeasure(u){}
 
 PhysicalNumber::IMeasure* PhysicalNumber::LenghtMeasure::createIfContainMeasure(Unit u)
 {
-	if(isFriend(s_friends, sizeof(s_friends)/sizeof(Unit), u))
+	if(isFriend(s_friendsOrdBig2Small, sizeof(s_friendsOrdBig2Small)/sizeof(Unit), u))
 	{
 		return new PhysicalNumber::LenghtMeasure(u);
 	}
 	return NULL;
 }
 
+void PhysicalNumber::LenghtMeasure::LockOnFriendsUnitsAndScales(Unit **units, double **scales, int &amount)
+{
+	amount = sizeof(s_friendsOrdBig2Small)/sizeof(Unit);
+	units[0] = (Unit *) s_friendsOrdBig2Small;
+	scales[0] = (double *) s_scalesRelatedSmallest;
+}
+
 void PhysicalNumber::LenghtMeasure::lockOnFriendsMeasures(Unit **out, int &amount)
 {
-	out = (Unit **)&s_friends;
-	amount = sizeof(s_friends)/sizeof(Unit);
+	out[0] = (Unit *)s_friendsOrdBig2Small;
+	amount = sizeof(s_friendsOrdBig2Small)/sizeof(Unit);
 }
 
 PhysicalNumber::WeightMeasure::WeightMeasure(Unit u):IMeasure(u){}
 
 PhysicalNumber::IMeasure* PhysicalNumber::WeightMeasure::createIfContainMeasure(Unit u)
 {
-	if(isFriend(s_friends, sizeof(s_friends)/sizeof(Unit), u))
+	if(isFriend(s_friendsOrdBig2Small, sizeof(s_friendsOrdBig2Small)/sizeof(Unit), u))
 	{
 		return new WeightMeasure(u);
 	}
 	return NULL;
 }
 
+void PhysicalNumber::WeightMeasure::LockOnFriendsUnitsAndScales(Unit **units, double **scales, int &amount)
+{
+	amount = sizeof(s_friendsOrdBig2Small)/sizeof(Unit);
+	units[0] = (Unit *) s_friendsOrdBig2Small;
+	scales[0] = (double *) s_scalesRelatedSmallest;
+}
+
 void PhysicalNumber::WeightMeasure::lockOnFriendsMeasures(Unit **out, int &amount)
 {
-	out = (Unit **)&s_friends;
-	amount = sizeof(s_friends)/sizeof(Unit);
+	out[0] = (Unit *)s_friendsOrdBig2Small;
+	amount = sizeof(s_friendsOrdBig2Small)/sizeof(Unit);
 }
 
 PhysicalNumber::TimeMeasure::TimeMeasure(Unit u):IMeasure(u){}
 
 PhysicalNumber::IMeasure* PhysicalNumber::TimeMeasure::createIfContainMeasure(Unit u)
 {
-	if(isFriend(s_friends, sizeof(s_friends)/sizeof(Unit), u))
+	if(isFriend(s_friendsOrdBig2Small, sizeof(s_friendsOrdBig2Small)/sizeof(Unit), u))
 	{
 		return new TimeMeasure(u);
 	}
 	return NULL;
 }
 
+void PhysicalNumber::TimeMeasure::LockOnFriendsUnitsAndScales(Unit **units, double **scales, int &amount)
+{
+	amount = sizeof(s_friendsOrdBig2Small)/sizeof(Unit);
+	units[0] = (Unit *) s_friendsOrdBig2Small;
+	scales[0] = (double *) s_scalesRelatedSmallest;
+}
+
 void PhysicalNumber::TimeMeasure::lockOnFriendsMeasures(Unit **out, int &amount)
 {
-	out = (Unit **)&s_friends;
-	amount = sizeof(s_friends)/sizeof(Unit);
+	out[0] = (Unit *)s_friendsOrdBig2Small;
+	amount = sizeof(s_friendsOrdBig2Small)/sizeof(Unit);
 }
 
 PhysicalNumber::IMeasure* PhysicalNumber::IMeasure::generateMeasure(Unit u)
@@ -147,6 +200,12 @@ PhysicalNumber::IMeasure* PhysicalNumber::IMeasure::generateMeasure(Unit u)
 	}
 
 	return ret;
+}
+
+double PhysicalNumber::IMeasure::toSmallestUnit(double value, Unit unit)
+{
+	// TODO
+	return 0.0;
 }
 
 }  // namespace ariel
