@@ -104,7 +104,7 @@ PhysicalNumber::IMeasure* PhysicalNumber::WeightMeasure::createIfContainMeasure(
 	if(isFriend(s_friends, sizeof(s_friends)/sizeof(Unit), u))
 	{
 		printf("create WeightMeasure\n");
-		//return new WeightMeasure(u);
+		return new WeightMeasure(u);
 	}
 	return NULL;
 }
@@ -120,7 +120,7 @@ PhysicalNumber::IMeasure* PhysicalNumber::TimeMeasure::createIfContainMeasure(Un
 	if(isFriend(s_friends, sizeof(s_friends)/sizeof(Unit), u))
 	{
 		printf("create TimeMeasure\n");
-		//return new TimeMeasure(u);
+		return new TimeMeasure(u);
 	}
 	return NULL;
 }
