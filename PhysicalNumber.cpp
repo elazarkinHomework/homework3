@@ -70,8 +70,14 @@ PhysicalNumber::~PhysicalNumber()
 PhysicalNumber PhysicalNumber::operator+(const PhysicalNumber& another)
 {
 	double result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) + IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
+
+	double fixedResult = result;
+	Unit fixedMeasureType;
+
+	m_measure->smallestResultToBestCompact(fixedResult, fixedMeasureType);
+
 	// TODO add convert to best unit function and call
-	return PhysicalNumber(0.0, Unit::M);
+	return PhysicalNumber(fixedResult, fixedMeasureType);
 }
 
 PhysicalNumber PhysicalNumber::operator-(const PhysicalNumber&)
@@ -204,8 +210,26 @@ PhysicalNumber::IMeasure* PhysicalNumber::IMeasure::generateMeasure(Unit u)
 
 double PhysicalNumber::IMeasure::toSmallestUnit(double value, Unit unit)
 {
-	// TODO
-	return 0.0;
+	return value*s_unitsScalesLookUpTable[unit];
+}
+
+void PhysicalNumber::IMeasure::smallestResultToBestCompact(double &value, Unit &unit)
+{
+	Unit *unitsPtr = NULL;
+	int amount = 0;
+	int bestIndex;
+
+	lockOnFriendsMeasures(&unitsPtr, amount);
+
+	bestIndex = amount - 1;
+
+	while(bestIndex > 0 && value/s_unitsScalesLookUpTable[unitsPtr[bestIndex-1]] > 1.0)
+	{
+		bestIndex--;
+	}
+
+	unit = unitsPtr[bestIndex];
+	value /= s_unitsScalesLookUpTable[unitsPtr[bestIndex]];
 }
 
 }  // namespace ariel

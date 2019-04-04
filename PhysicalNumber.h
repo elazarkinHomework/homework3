@@ -12,6 +12,7 @@
 #include <ostream>
 #include <istream>
 #include <iostream>
+#include <iomanip>
 
 namespace ariel {
 
@@ -33,6 +34,8 @@ private:
 
 	public:
 		UnitsScalesLookUpTable();
+
+		double operator[](const Unit &u) const { return m_lookUpTable[u];}
 
 	};
 
@@ -57,6 +60,12 @@ private:
 		static IMeasure *generateMeasure(Unit u);
 
 		static double toSmallestUnit(double value, Unit unit);
+
+		/**
+		 * This util function can't be static cause we call virtual method of get friends
+		 * so in a practice we use m_measure object even though it not use any internal variables
+		 */
+		void smallestResultToBestCompact(double &value, Unit &unit);
 
 	public:
 		typedef IMeasure*(CreateIfContainMeasureFunction)(Unit u);
@@ -138,7 +147,7 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& out, const PhysicalNumber& pn)
 	{
-		out << pn.m_value << "[" << pn.m_measure->unit() << "]";
+		out<< std::fixed << std::setw(11) << std::setprecision(3) << pn.m_value << "[" << pn.m_measure->unit() << "]";
 		return out;
 	}
 
