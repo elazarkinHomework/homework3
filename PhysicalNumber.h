@@ -25,18 +25,17 @@ private:
 	protected:
 		Unit m_unit;
 
-		virtual void lockOnFriendsMeasures(Unit **, int &amount);
+		virtual void lockOnFriendsMeasures(Unit **, int &amount){}
 
 	public:
 
-		IMeasure(Unit u){m_unit = u;}
-
+		IMeasure(Unit u);
 		static bool isFriend(const Unit *friendsList, int listSize, Unit u);
 
 		static IMeasure *generateMeasure(Unit u);
 
 	public:
-		typedef IMeasure*(CreateIfContainMeasureFunction)(Unit);
+		typedef IMeasure*(CreateIfContainMeasureFunction)(Unit u);
 	private:
 		static const CreateIfContainMeasureFunction *s_createIfContainMeasureFunctions[];
 	};
@@ -44,7 +43,8 @@ private:
 	class LenghtMeasure : public IMeasure
 	{
 	public:
-		LenghtMeasure(Unit u):IMeasure(u){}
+		LenghtMeasure(Unit u);
+
 	private:
 		const static Unit s_friends[];
 
