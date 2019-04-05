@@ -61,6 +61,8 @@ private:
 
 		static double toSmallestUnit(double value, Unit unit);
 
+		void updateType(Unit u);
+
 		/**
 		 * This util function can't be static cause we call virtual method of get friends
 		 * so in a practice we use m_measure object even though it not use any internal variables

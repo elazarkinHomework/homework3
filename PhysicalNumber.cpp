@@ -69,6 +69,12 @@ PhysicalNumber::~PhysicalNumber()
 	}
 }
 
+// TODO
+// TODO
+// TODO check friend measures before operation!
+// TODO
+// TODO
+
 PhysicalNumber PhysicalNumber::operator+(const PhysicalNumber& another)
 {
 	double result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) + IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
@@ -102,9 +108,17 @@ PhysicalNumber PhysicalNumber::operator-()
 	return PhysicalNumber(fixedResult, fixedMeasureType);
 }
 
-PhysicalNumber& PhysicalNumber::operator +=(const PhysicalNumber&)
+PhysicalNumber& PhysicalNumber::operator +=(const PhysicalNumber&another)
 {
-	//TODO
+	double result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) + IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
+	double fixedResult = result;
+	Unit fixedMeasureType;
+
+	m_measure->smallestResultToBestCompact(fixedResult, fixedMeasureType);
+
+	m_value = fixedResult;
+	m_measure->updateType(fixedMeasureType);
+
 	return *this;
 }
 
@@ -216,6 +230,12 @@ PhysicalNumber::IMeasure* PhysicalNumber::IMeasure::generateMeasure(Unit u)
 	}
 
 	return ret;
+}
+
+void PhysicalNumber::IMeasure::updateType(Unit u)
+{
+	// TODO test if u is friend
+	m_unit = u;
 }
 
 double PhysicalNumber::IMeasure::toSmallestUnit(double value, Unit unit)
