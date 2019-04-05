@@ -93,8 +93,13 @@ PhysicalNumber PhysicalNumber::operator-(const PhysicalNumber&another)
 
 PhysicalNumber PhysicalNumber::operator-()
 {
-	//TODO
-	return PhysicalNumber(0.0, Unit::M);
+	double result = -IMeasure::toSmallestUnit(m_value, m_measure->unit());
+	double fixedResult = result;
+	Unit fixedMeasureType;
+
+	m_measure->smallestResultToBestCompact(fixedResult, fixedMeasureType);
+
+	return PhysicalNumber(fixedResult, fixedMeasureType);
 }
 
 PhysicalNumber& PhysicalNumber::operator +=(const PhysicalNumber&)
