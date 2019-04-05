@@ -7,6 +7,8 @@
 
 #include "PhysicalNumber.h"
 
+#include <math.h>
+
 namespace ariel {
 
 const Unit PhysicalNumber::LenghtMeasure::s_friendsOrdBig2Small[] = {Unit::KM, Unit::M, Unit::CM, Unit::MM};
@@ -70,20 +72,23 @@ PhysicalNumber::~PhysicalNumber()
 PhysicalNumber PhysicalNumber::operator+(const PhysicalNumber& another)
 {
 	double result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) + IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
-
 	double fixedResult = result;
 	Unit fixedMeasureType;
 
 	m_measure->smallestResultToBestCompact(fixedResult, fixedMeasureType);
 
-	// TODO add convert to best unit function and call
 	return PhysicalNumber(fixedResult, fixedMeasureType);
 }
 
-PhysicalNumber PhysicalNumber::operator-(const PhysicalNumber&)
+PhysicalNumber PhysicalNumber::operator-(const PhysicalNumber&another)
 {
-	//TODO
-	return PhysicalNumber(0.0, Unit::M);
+	double result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) - IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
+	double fixedResult = result;
+	Unit fixedMeasureType;
+
+	m_measure->smallestResultToBestCompact(fixedResult, fixedMeasureType);
+
+	return PhysicalNumber(fixedResult, fixedMeasureType);
 }
 
 PhysicalNumber PhysicalNumber::operator-()
@@ -223,7 +228,7 @@ void PhysicalNumber::IMeasure::smallestResultToBestCompact(double &value, Unit &
 
 	bestIndex = amount - 1;
 
-	while(bestIndex > 0 && value/s_unitsScalesLookUpTable[unitsPtr[bestIndex-1]] > 1.0)
+	while(bestIndex > 0 && fabs(value/s_unitsScalesLookUpTable[unitsPtr[bestIndex-1]]) > 1.0)
 	{
 		bestIndex--;
 	}
