@@ -55,6 +55,8 @@ private:
 
 		Unit unit();
 
+		bool checkIfUnitIsFried(Unit u);
+
 		static bool isFriend(const Unit *friendsList, int listSize, Unit u);
 
 		static IMeasure *generateMeasure(Unit u);
@@ -136,16 +138,18 @@ public:
 	PhysicalNumber(double value, Unit type);
 	virtual ~PhysicalNumber();
 
+	void throwIfWrongMeasures(const PhysicalNumber &another);
+
 	PhysicalNumber operator+(const PhysicalNumber&);
 	PhysicalNumber operator-(const PhysicalNumber&);
 	PhysicalNumber operator-();
 	PhysicalNumber& operator+=(const PhysicalNumber&);
 
-	bool operator<(const PhysicalNumber&){return false;}
-	bool operator<=(const PhysicalNumber&){return false;}
-	bool operator>(const PhysicalNumber&){return false;}
-	bool operator>=(const PhysicalNumber&){return false;}
-	bool operator==(const PhysicalNumber&){return false;}
+	bool operator<(const PhysicalNumber&);
+	bool operator<=(const PhysicalNumber&);
+	bool operator>(const PhysicalNumber&);
+	bool operator>=(const PhysicalNumber&);
+	bool operator==(const PhysicalNumber&);
 
 	friend std::ostream& operator<<(std::ostream& out, const PhysicalNumber& pn)
 	{

@@ -69,32 +69,52 @@ PhysicalNumber::~PhysicalNumber()
 	}
 }
 
-// TODO
-// TODO
-// TODO check friend measures before operation!
-// TODO
-// TODO
+void PhysicalNumber::throwIfWrongMeasures(const PhysicalNumber &another)
+{
+	if(!m_measure->checkIfUnitIsFried(another.m_measure->unit()))
+	{
+		char message[256];
+
+		sprintf
+		(
+			message,
+			"Units do not match - [%s] cannot be converted to [%s]",
+			UnitToStringMap[m_measure->unit()],
+			UnitToStringMap[another.m_measure->unit()]
+		);
+
+		printf("before throw: %s\n", message);
+
+		throw std::runtime_error(message);
+	}
+}
 
 PhysicalNumber PhysicalNumber::operator+(const PhysicalNumber& another)
 {
-	double result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) + IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
-	double fixedResult = result;
+	double result;
 	Unit fixedMeasureType;
 
-	m_measure->smallestResultToBestCompact(fixedResult, fixedMeasureType);
+	throwIfWrongMeasures(another);
 
-	return PhysicalNumber(fixedResult, fixedMeasureType);
+	result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) + IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
+
+	m_measure->smallestResultToBestCompact(result, fixedMeasureType);
+
+	return PhysicalNumber(result, fixedMeasureType);
 }
 
 PhysicalNumber PhysicalNumber::operator-(const PhysicalNumber&another)
 {
-	double result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) - IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
-	double fixedResult = result;
+	double result;
 	Unit fixedMeasureType;
 
-	m_measure->smallestResultToBestCompact(fixedResult, fixedMeasureType);
+	throwIfWrongMeasures(another);
 
-	return PhysicalNumber(fixedResult, fixedMeasureType);
+	result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) - IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
+
+	m_measure->smallestResultToBestCompact(result, fixedMeasureType);
+
+	return PhysicalNumber(result, fixedMeasureType);
 }
 
 PhysicalNumber PhysicalNumber::operator-()
@@ -110,16 +130,51 @@ PhysicalNumber PhysicalNumber::operator-()
 
 PhysicalNumber& PhysicalNumber::operator +=(const PhysicalNumber&another)
 {
-	double result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) + IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
-	double fixedResult = result;
+	double result;
 	Unit fixedMeasureType;
 
-	m_measure->smallestResultToBestCompact(fixedResult, fixedMeasureType);
+	throwIfWrongMeasures(another);
 
-	m_value = fixedResult;
+	result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) + IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
+
+	m_measure->smallestResultToBestCompact(result, fixedMeasureType);
+
+	m_value = result;
 	m_measure->updateType(fixedMeasureType);
 
 	return *this;
+}
+
+// TODO add operators * *= / /=
+
+bool PhysicalNumber::operator<(const PhysicalNumber&another)
+{
+	throwIfWrongMeasures(another);
+	return IMeasure::toSmallestUnit(m_value, m_measure->unit()) < IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
+}
+
+bool PhysicalNumber::operator<=(const PhysicalNumber&another)
+{
+	throwIfWrongMeasures(another);
+	return IMeasure::toSmallestUnit(m_value, m_measure->unit()) <= IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
+}
+
+bool PhysicalNumber::operator>(const PhysicalNumber&another)
+{
+	throwIfWrongMeasures(another);
+	return IMeasure::toSmallestUnit(m_value, m_measure->unit()) > IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
+}
+
+bool PhysicalNumber::operator>=(const PhysicalNumber&another)
+{
+	throwIfWrongMeasures(another);
+	return IMeasure::toSmallestUnit(m_value, m_measure->unit()) >= IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
+}
+
+bool PhysicalNumber::operator==(const PhysicalNumber&another)
+{
+	throwIfWrongMeasures(another);
+	return IMeasure::toSmallestUnit(m_value, m_measure->unit()) == IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
 }
 
 PhysicalNumber::IMeasure::IMeasure(Unit u)
@@ -130,6 +185,16 @@ PhysicalNumber::IMeasure::IMeasure(Unit u)
 Unit PhysicalNumber::IMeasure::unit()
 {
 	return m_unit;
+}
+
+bool PhysicalNumber::IMeasure::checkIfUnitIsFried(Unit u)
+{
+	Unit *units = NULL;
+	int amount = 0;
+
+	lockOnFriendsMeasures(&units, amount);
+
+	return isFriend(units, amount, u);
 }
 
 bool PhysicalNumber::IMeasure::isFriend(const Unit *friendsList, int listSize, Unit u)
@@ -234,7 +299,6 @@ PhysicalNumber::IMeasure* PhysicalNumber::IMeasure::generateMeasure(Unit u)
 
 void PhysicalNumber::IMeasure::updateType(Unit u)
 {
-	// TODO test if u is friend
 	m_unit = u;
 }
 
