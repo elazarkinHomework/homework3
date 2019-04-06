@@ -13,6 +13,7 @@
 #include <istream>
 #include <iostream>
 #include <iomanip>
+#include <string.h>
 
 namespace ariel {
 
@@ -157,8 +158,50 @@ public:
 		return out;
 	}
 
-	friend std::istream& operator>>(std::istream& in, const PhysicalNumber&)
+	friend std::istream& operator>>(std::istream& in, PhysicalNumber& pn)
 	{
+		std::string message;
+		double value;
+		char measure[16];
+		int ret = 0;
+		bool success = true;
+
+		in >> message;
+
+		success = (ret=sscanf(message.c_str(), "%lf[%[^]]s]", &value, measure)) == 2;
+
+		if(success)
+		{
+			pn.m_value = value;
+
+			success = false;
+
+			for(int u = 0; u < Unit::UNITS_SIZE; u++)
+			{
+				if(strcmp(UnitToStringMap[u], measure) == 0)
+				{
+					if(pn.m_measure != NULL)
+					{
+						delete pn.m_measure;
+						pn.m_measure = NULL;
+					}
+					pn.m_measure = IMeasure::generateMeasure((Unit) u);
+					success = true;
+					break;
+				}
+			}
+		}
+
+		if(!success)
+		{
+			fprintf
+			(
+				stderr,
+				"Warning: used wrong format init PhysicalNumber with istream operator! (was <%s> must be <value[measure]>)\n",
+				message.c_str()
+			);
+		}
+
 		return in;
 	}
 };

@@ -79,8 +79,8 @@ void PhysicalNumber::throwIfWrongMeasures(const PhysicalNumber &another)
 		(
 			message,
 			"Units do not match - [%s] cannot be converted to [%s]",
-			UnitToStringMap[m_measure->unit()],
-			UnitToStringMap[another.m_measure->unit()]
+			UnitToStringMap[another.m_measure->unit()],
+			UnitToStringMap[m_measure->unit()]
 		);
 
 		printf("before throw: %s\n", message);
