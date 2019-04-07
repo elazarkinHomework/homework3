@@ -22,14 +22,14 @@ const double PhysicalNumber::TimeMeasure::s_scalesRelatedSmallest[] = {3600.0, 6
 
 const PhysicalNumber::UnitsScalesLookUpTable PhysicalNumber::IMeasure::s_unitsScalesLookUpTable;
 
-const PhysicalNumber::IMeasure::CreateIfContainMeasureFunction *PhysicalNumber::IMeasure::s_createIfContainMeasureFunctions[] =
+PhysicalNumber::IMeasure::CreateIfContainMeasureFunction *PhysicalNumber::IMeasure::s_createIfContainMeasureFunctions[] =
 {
 	&PhysicalNumber::LenghtMeasure::createIfContainMeasure,
 	&PhysicalNumber::WeightMeasure::createIfContainMeasure,
 	&PhysicalNumber::TimeMeasure::createIfContainMeasure
 };
 
-const PhysicalNumber::UnitsScalesLookUpTable::LockOnFriendsUnitsAndScalesFunction *PhysicalNumber::UnitsScalesLookUpTable::s_lockOnFriendsUnitsAndScalesFunction[] =
+PhysicalNumber::UnitsScalesLookUpTable::LockOnFriendsUnitsAndScalesFunction *PhysicalNumber::UnitsScalesLookUpTable::s_lockOnFriendsUnitsAndScalesFunction[] =
 {
 	&PhysicalNumber::LenghtMeasure::LockOnFriendsUnitsAndScales,
 	&PhysicalNumber::WeightMeasure::LockOnFriendsUnitsAndScales,
@@ -66,6 +66,8 @@ PhysicalNumber::~PhysicalNumber()
 	if(m_measure != NULL)
 	{
 		delete[] m_measure;
+
+		m_measure = NULL;
 	}
 }
 
@@ -83,8 +85,6 @@ void PhysicalNumber::throwIfWrongMeasures(const PhysicalNumber &another)
 			UnitToStringMap[m_measure->unit()]
 		);
 
-		printf("before throw: %s\n", message);
-
 		throw std::runtime_error(message);
 	}
 }
@@ -92,15 +92,17 @@ void PhysicalNumber::throwIfWrongMeasures(const PhysicalNumber &another)
 PhysicalNumber PhysicalNumber::operator+(const PhysicalNumber& another)
 {
 	double result;
-	Unit fixedMeasureType;
+	//Unit fixedMeasureType;
 
 	throwIfWrongMeasures(another);
 
 	result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) + IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
 
-	m_measure->smallestResultToBestCompact(result, fixedMeasureType);
+	//m_measure->smallestResultToBestCompact(result, fixedMeasureType);
 
-	return PhysicalNumber(result, fixedMeasureType);
+	m_measure->smallestResultToForceFormat(result, m_measure->unit());
+
+	return PhysicalNumber(result, m_measure->unit());
 }
 
 PhysicalNumber PhysicalNumber::operator-(const PhysicalNumber&another)
@@ -112,9 +114,11 @@ PhysicalNumber PhysicalNumber::operator-(const PhysicalNumber&another)
 
 	result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) - IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
 
-	m_measure->smallestResultToBestCompact(result, fixedMeasureType);
+	//m_measure->smallestResultToBestCompact(result, fixedMeasureType);
 
-	return PhysicalNumber(result, fixedMeasureType);
+	m_measure->smallestResultToForceFormat(result, m_measure->unit());
+
+	return PhysicalNumber(result, m_measure->unit());
 }
 
 PhysicalNumber PhysicalNumber::operator-()
@@ -123,9 +127,11 @@ PhysicalNumber PhysicalNumber::operator-()
 	double fixedResult = result;
 	Unit fixedMeasureType;
 
-	m_measure->smallestResultToBestCompact(fixedResult, fixedMeasureType);
+	//m_measure->smallestResultToBestCompact(fixedResult, fixedMeasureType);
 
-	return PhysicalNumber(fixedResult, fixedMeasureType);
+	m_measure->smallestResultToForceFormat(result, m_measure->unit());
+
+	return PhysicalNumber(fixedResult, m_measure->unit());
 }
 
 PhysicalNumber& PhysicalNumber::operator +=(const PhysicalNumber&another)
@@ -137,10 +143,13 @@ PhysicalNumber& PhysicalNumber::operator +=(const PhysicalNumber&another)
 
 	result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) + IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
 
-	m_measure->smallestResultToBestCompact(result, fixedMeasureType);
+	//m_measure->smallestResultToBestCompact(result, fixedMeasureType);
+
+	m_measure->smallestResultToForceFormat(result, m_measure->unit());
 
 	m_value = result;
-	m_measure->updateType(fixedMeasureType);
+//	m_measure->updateType(fixedMeasureType);
+	m_measure->updateType(m_measure->unit());
 
 	return *this;
 }
@@ -322,6 +331,11 @@ void PhysicalNumber::IMeasure::smallestResultToBestCompact(double &value, Unit &
 
 	unit = unitsPtr[bestIndex];
 	value /= s_unitsScalesLookUpTable[unitsPtr[bestIndex]];
+}
+
+void PhysicalNumber::IMeasure::smallestResultToForceFormat(double &value, const Unit unit)
+{
+	value /= s_unitsScalesLookUpTable[unit];
 }
 
 }  // namespace ariel

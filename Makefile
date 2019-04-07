@@ -14,9 +14,9 @@ test: PhysicalNumberTest.o PhysicalNumber.o
 
 PhysicalNumber.o: PhysicalNumber.h Unit.h
 
-PhysicalNumberDemo.o: PhysicalNumber.h Unit.h
+PhysicalNumberDemo.o: PhysicalNumber.cpp Unit.h
 
-PhysicalNumberTest.o: PhysicalNumber.h Unit.h badkan.hpp
+PhysicalNumberTest.o: PhysicalNumber.cpp Unit.h badkan.hpp
 
 clean:
 	rm -f *.o demo test

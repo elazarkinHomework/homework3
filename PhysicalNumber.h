@@ -31,7 +31,7 @@ private:
 
 		typedef void (LockOnFriendsUnitsAndScalesFunction)(Unit **units, double **scales, int &amount);
 
-		static const LockOnFriendsUnitsAndScalesFunction *s_lockOnFriendsUnitsAndScalesFunction[];
+		static LockOnFriendsUnitsAndScalesFunction *s_lockOnFriendsUnitsAndScalesFunction[];
 
 	public:
 		UnitsScalesLookUpTable();
@@ -72,11 +72,13 @@ private:
 		 */
 		void smallestResultToBestCompact(double &value, Unit &unit);
 
+		void smallestResultToForceFormat(double &value, const Unit unit);
+
 	public:
 		typedef IMeasure*(CreateIfContainMeasureFunction)(Unit u);
 
 	private:
-		static const CreateIfContainMeasureFunction *s_createIfContainMeasureFunctions[];
+		static CreateIfContainMeasureFunction *s_createIfContainMeasureFunctions[];
 	};
 
 	class LenghtMeasure : public IMeasure
@@ -154,7 +156,8 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& out, const PhysicalNumber& pn)
 	{
-		out<< std::fixed << std::setw(11) << std::setprecision(3) << pn.m_value << "[" << pn.m_measure->unit() << "]";
+		//out<< std::fixed << std::setw(11) << std::setprecision(3) << pn.m_value << "[" << pn.m_measure->unit() << "]";
+		out<<pn.m_value << "[" << pn.m_measure->unit() << "]";
 		return out;
 	}
 
