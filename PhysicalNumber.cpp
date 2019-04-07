@@ -145,8 +145,6 @@ PhysicalNumber& PhysicalNumber::operator +=(const PhysicalNumber&another)
 	return *this;
 }
 
-// TODO add operators * *= / /=
-
 bool PhysicalNumber::operator<(const PhysicalNumber&another)
 {
 	throwIfWrongMeasures(another);
