@@ -145,6 +145,17 @@ PhysicalNumber PhysicalNumber::operator-(const PhysicalNumber&another)
 	return PhysicalNumber(result, m_measure->unit());
 }
 
+PhysicalNumber PhysicalNumber::operator+()
+{
+	double result = IMeasure::toSmallestUnit(m_value, m_measure->unit());
+	double fixedResult = result;
+	Unit fixedMeasureType;
+
+	m_measure->smallestResultToForceFormat(result, m_measure->unit());
+
+	return PhysicalNumber(fixedResult, m_measure->unit());
+}
+
 PhysicalNumber PhysicalNumber::operator-()
 {
 	double result = -IMeasure::toSmallestUnit(m_value, m_measure->unit());
