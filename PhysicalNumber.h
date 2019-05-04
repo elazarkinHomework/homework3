@@ -146,6 +146,8 @@ public:
 	PhysicalNumber operator+(const PhysicalNumber&);
 	PhysicalNumber operator++(int n);
 	PhysicalNumber operator--(int n);
+	PhysicalNumber operator++();
+	PhysicalNumber operator--();
 	PhysicalNumber operator-(const PhysicalNumber&);
 	PhysicalNumber operator-();
 	PhysicalNumber& operator+=(const PhysicalNumber&);
