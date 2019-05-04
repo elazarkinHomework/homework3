@@ -154,6 +154,26 @@ PhysicalNumber& PhysicalNumber::operator +=(const PhysicalNumber&another)
 	return *this;
 }
 
+PhysicalNumber& PhysicalNumber::operator -=(const PhysicalNumber&another)
+{
+	double result;
+	Unit fixedMeasureType;
+
+	throwIfWrongMeasures(another);
+
+	result = IMeasure::toSmallestUnit(m_value, m_measure->unit()) - IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
+
+	//m_measure->smallestResultToBestCompact(result, fixedMeasureType);
+
+	m_measure->smallestResultToForceFormat(result, m_measure->unit());
+
+	m_value = result;
+//	m_measure->updateType(fixedMeasureType);
+	m_measure->updateType(m_measure->unit());
+
+	return *this;
+}
+
 bool PhysicalNumber::operator<(const PhysicalNumber&another)
 {
 	throwIfWrongMeasures(another);
