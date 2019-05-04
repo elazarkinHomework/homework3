@@ -156,6 +156,7 @@ public:
 	bool operator>(const PhysicalNumber&);
 	bool operator>=(const PhysicalNumber&);
 	bool operator==(const PhysicalNumber&);
+	bool operator!=(const PhysicalNumber&);
 
 	friend std::ostream& operator<<(std::ostream& out, const PhysicalNumber& pn)
 	{

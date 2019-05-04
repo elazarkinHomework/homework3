@@ -216,6 +216,12 @@ bool PhysicalNumber::operator==(const PhysicalNumber&another)
 	return IMeasure::toSmallestUnit(m_value, m_measure->unit()) == IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit());
 }
 
+bool PhysicalNumber::operator!=(const PhysicalNumber&another)
+{
+	throwIfWrongMeasures(another);
+	return !(IMeasure::toSmallestUnit(m_value, m_measure->unit()) == IMeasure::toSmallestUnit(another.m_value, another.m_measure->unit()));
+}
+
 PhysicalNumber::IMeasure::IMeasure(Unit u)
 {
 	m_unit = u;
