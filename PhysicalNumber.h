@@ -144,6 +144,8 @@ public:
 	void throwIfWrongMeasures(const PhysicalNumber &another);
 
 	PhysicalNumber operator+(const PhysicalNumber&);
+	PhysicalNumber operator++(int n);
+	PhysicalNumber operator--(int n);
 	PhysicalNumber operator-(const PhysicalNumber&);
 	PhysicalNumber operator-();
 	PhysicalNumber& operator+=(const PhysicalNumber&);

@@ -105,6 +105,18 @@ PhysicalNumber PhysicalNumber::operator+(const PhysicalNumber& another)
 	return PhysicalNumber(result, m_measure->unit());
 }
 
+PhysicalNumber PhysicalNumber::operator++(int n)
+{
+	m_value += n;
+	return PhysicalNumber(m_value, m_measure->unit());
+}
+
+PhysicalNumber PhysicalNumber::operator--(int n)
+{
+	m_value -= n;
+	return PhysicalNumber(m_value, m_measure->unit());
+}
+
 PhysicalNumber PhysicalNumber::operator-(const PhysicalNumber&another)
 {
 	double result;
